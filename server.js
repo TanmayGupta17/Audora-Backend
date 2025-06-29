@@ -21,9 +21,19 @@ connectDB(process.env.MONGO_URI)
 
 // Middleware
 app.use(express.json());
+
+const allowedOrigin =
+  process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:3000";
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: function (origin, callback) {
+      if (!origin || origin === allowedOrigin) {
+        callback(null, true); // Allow
+      } else {
+        callback(new Error("Not allowed by CORS")); // Block
+      }
+    },
     credentials: true,
   })
 );
